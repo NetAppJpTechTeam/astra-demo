@@ -1,0 +1,9 @@
+# Trident IMPORT 
+BACKEND_NAME=bk-ontapnas
+VOL_NAME=dest_sm01
+IMPORT_FILE=import.yaml
+
+# command : tridentctl -n trident import volume bk-ontapnas dest_sm01 -f import.yaml
+tridentctl -n trident import volume $BACKEND_NAME $VOL_NAME -f $IMPORT_FILE
+
+
