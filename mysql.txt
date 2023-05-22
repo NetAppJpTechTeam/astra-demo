@@ -1,0 +1,13 @@
+mysql -u root -p
+my-secret-pw
+
+show databases; 
+use "DB_NAME";
+show tables;
+
+select * from "table_name";
+update product set price = price * 1.1;
+select * from "table_name";
+
+
+#update "table_name" set price = '795' where product_id='510a0d7e-8e83-4193-b483-e27e09ddc34d';
