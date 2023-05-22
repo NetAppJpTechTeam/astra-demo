@@ -28,12 +28,14 @@ VOL_NAME_SRC=$TRIDENT_PREFIX`echo $PV_NAME_SRC|sed -e s/-/_/g`
 ### ---------
 
 # Ontapコマンド生成: snapmirror
+echo "- ontap snapmirror"
 echo "volume create -vserver $SVM_NAME_DEST -aggregate $AGGR_NAME -type DP -size 10g -volume $TMP_VOL_NAME_DEST"
 echo "snapmirror initialize -destination-path $SVM_NAME_DEST:$TMP_VOL_NAME_DEST -source-path $SVM_NAME_SRC:$VOL_NAME_SRC"
 echo "snapmirror show -destination-path $SVM_NAME_DEST:$TMP_VOL_NAME_DEST -source-path $SVM_NAME_SRC:$VOL_NAME_SRC"
 echo "snapmirror break -destination-path $SVM_NAME_DEST:$TMP_VOL_NAME_DEST -source-path $SVM_NAME_SRC:$VOL_NAME_SRC"
 
 # Ontapコマンド生成: clone / rehost
+echo "- ontap clone"
 echo "volume clone create -parent-volume $VOL_NAME_SRC -vserver $SVM_NAME_SRC -flexclone $TMP_CLONE_NAME"
 echo "volume clone split start -vserver $SVM_NAME_SRC -flexclone $TMP_CLONE_NAME"
 echo "volume rehost -vserver $SVM_NAME_SRC -volume $TMP_CLONE_NAME -destination-vserver $SVM_NAME_DEST"
@@ -41,6 +43,7 @@ echo "volume rehost -vserver $SVM_NAME_SRC -volume $TMP_CLONE_NAME -destination-
 
 
 # Trident コマンド生成
+echo "- trident import "
 echo "tridentctl -n trident import volume $BACKEND_NAME $TMP_VOL_NAME_DEST -f $TRIDENT_IMPORT_FILE"
 
 #  IMPORT FILE生成
