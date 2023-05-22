@@ -1,0 +1,51 @@
+### ---
+# Ontapコマンド
+volume create -vserver svmbk1 -aggregate soc_ontap_01_SSD_1 -type DP -size 10g -volume dest_sm01
+snapmirror initialize -destination-path svmbk1:dest_sm01 -source-path svm1:trident_svm1_34_pvc_db26c8b8_b90b_4c8d_a29c_d8bcd8d7188d
+snapmirror show -destination-path svmbk1:dest_sm01 -source-path svm1:trident_svm1_34_pvc_db26c8b8_b90b_4c8d_a29c_d8bcd8d7188d
+snapmirror break -destination-path svmbk1:dest_sm01 -source-path svm1:trident_svm1_34_pvc_db26c8b8_b90b_4c8d_a29c_d8bcd8d7188d
+
+# Trident コマンド
+tridentctl -n trident import volume bk-ontapnas dest_sm01 -f trident_import.yaml
+
+#  IMPORT FILE
+cat << EOF > trident_import.yaml
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-cdata-catalog-mysql-0
+  namespace: default
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: ontap-nas
+  resources:
+    requests:
+        storage: 10Gi
+EOF
+
+
+### ---------
+### VAR ###
+### ---------
+
+# ONTAP IMFO
+SVM_NAME_SRC=svm1
+SVM_NAME_DEST=svmbk1
+AGGR_NAME=soc_ontap_01_SSD_1
+TMP_VOL_NAME_DEST=dest_sm01
+VOL_SIZE=10Gi
+
+# Kubernetes / TRIDENT INFO
+POD_NAME=catalog-mysql-0
+BACKEND_NAME=bk-ontapnas
+TRIDENT_PREFIX="trident_svm1_34_"
+STORAGE_CLASS=ontap-nas
+TRIDENT_IMPORT_FILE=trident_import.yaml
+
+# Other
+PVC_NAME_SRC=`kubectl get pod $POD_NAME -o custom-columns='DATA:spec.volumes[*].persistentVolumeClaim.claimName'|grep -v DATA`
+PV_NAME_SRC=`kubectl get pv|grep $PVC_NAME_SRC|cut -f 1 -d " "`
+VOL_NAME_SRC=$TRIDENT_PREFIX`echo $PV_NAME_SRC|sed -e s/-/_/g`
+
