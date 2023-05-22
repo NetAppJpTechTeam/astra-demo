@@ -1,0 +1,69 @@
+- name: ONTAP VOLUME CLONE
+  hosts: localhost
+  gather_facts: no
+  collections:
+    - ansible.builtin
+    - netapp.ontap
+  vars:
+    - cluster_username: admin
+    - cluster_hostname: 10.128.211.31
+    - src_vol  : trident_svm1_34_pvc_db26c8b8_b90b_4c8d_a29c_d8bcd8d7188d
+    - dest_vol : dest_sm01
+    - src_svm  : svm1
+    - dest_svm : svmbk1
+    - size     : 10
+    - aggregate_name: soc_ontap_01_SSD_1
+  vars_prompt:
+    - name: "cluster_password"
+      prompt: "Please enter Password"
+      private: yes
+      default: "password"
+  tasks:
+    - name: create DP volume.
+      na_ontap_volume:
+        state          : present
+        validate_certs : no
+        https          : yes
+        hostname: "{{ cluster_hostname }}"
+        username: "{{ cluster_username }}"
+        password: "{{ cluster_password }}"
+        vserver: "{{ dest_svm }}"
+        name: "{{ dest_vol }}"
+        size: "{{ size }}"
+        type: DP
+        space_guarantee: none
+        wait_for_completion: True
+        aggregate_name: "{{ aggregate_name }}"
+      when: not ansible_check_mode
+
+
+    - name: Create SnapMirror relationship (create destination volume)
+      netapp.ontap.na_ontap_snapmirror:
+        state: present
+        source_volume      : "{{ src_vol }}"
+        destination_volume : "{{ dest_vol }}"
+        source_vserver     : "{{ src_svm }}"
+        destination_vserver: "{{ dest_svm }}"
+        schedule: hourly
+        initialize: true
+        validate_certs : no
+        https          : yes
+        hostname: "{{ cluster_hostname }}"
+        username: "{{ cluster_username }}"
+        password: "{{ cluster_password }}"
+      when: not ansible_check_mode
+
+    - name: SnapMirror Break
+      netapp.ontap.na_ontap_snapmirror:
+        state: present
+        relationship_state: broken
+        source_volume      : "{{ src_vol }}"
+        destination_volume : "{{ dest_vol }}"
+        source_vserver     : "{{ src_svm }}"
+        destination_vserver: "{{ dest_svm }}"
+        validate_certs : no
+        https          : yes
+        hostname: "{{ cluster_hostname }}"
+        username: "{{ cluster_username }}"
+        password: "{{ cluster_password }}"
+      when: not ansible_check_mode

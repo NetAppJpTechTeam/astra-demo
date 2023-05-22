@@ -1,0 +1,47 @@
+- name: ONTAP VOLUME CLONE
+  hosts: localhost
+  gather_facts: no
+  collections:
+    - ansible.builtin
+    - netapp.ontap
+  vars:
+    - cluster_username: admin
+    - cluster_hostname: 10.128.211.31
+    - src_vol  : trident_svm1_34_pvc_db26c8b8_b90b_4c8d_a29c_d8bcd8d7188d
+    - dest_vol : dest_sm01
+    - src_svm  : svm1
+    - dest_svm : svmbk1
+    - size     : 10
+    - aggregate_name: soc_ontap_01_SSD_1
+  vars_prompt:
+    - name: "cluster_password"
+      prompt: "Please enter Password"
+      private: yes
+      default: "password"
+  tasks:
+    - name: clone volume
+      netapp.ontap.na_ontap_volume_clone:
+        validate_certs : no
+        https          : yes
+        hostname: "{{ cluster_hostname }}"
+        username: "{{ cluster_username }}"
+        password: "{{ cluster_password }}"
+        vserver: "{{ src_svm }}"
+        name: "{{ dest_vol }}_clone"
+        parent_volume: "{{ src_vol }}"
+        space_reserve: none
+        split: yes
+      when: not ansible_check_mode
+
+    - name: rehost volume - use ZAPI
+      na_ontap_volume:
+        use_rest: never
+        from_vserver: "{{ src_svm }}"
+        validate_certs : no
+        https          : yes
+        hostname: "{{ cluster_hostname }}"
+        username: "{{ cluster_username }}"
+        password: "{{ cluster_password }}"
+        vserver: "{{ dest_svm }}"
+        name: "{{ dest_vol }}_clone"
+      when: not ansible_check_mode

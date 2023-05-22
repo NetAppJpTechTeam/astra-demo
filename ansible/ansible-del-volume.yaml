@@ -1,0 +1,37 @@
+- name: ONTAP VOLUME delete
+  hosts: localhost
+  gather_facts: no
+#  vars_files:
+#    - ../vars/ontap.yml
+#    - ./ontap.yml
+  collections:
+    - ansible.builtin
+    - netapp.ontap
+  vars:
+    - cluster_username: admin
+    - cluster_hostname: 10.128.211.31
+    - svm_name: svmbk1
+  vars_prompt:
+    - name: "vol_name"
+      prompt: "Please enter volume name"
+      private: no
+    - name: "cluster_password"
+      prompt: "Please enter Password"
+      private: yes
+      default: "password"
+  tasks:
+    - name: delete volume.
+      na_ontap_volume:
+        state          : absent
+        validate_certs : no
+        https          : yes
+        hostname: "{{ cluster_hostname }}"
+        username: "{{ cluster_username }}"
+        password: "{{ cluster_password }}"
+        vserver: "{{ svm_name }}"
+        name: "{{ vol_name }}"
+#        name: "{{ item }}"
+#      with_items:
+#        - dest_sm01
+      when: not ansible_check_mode
+
