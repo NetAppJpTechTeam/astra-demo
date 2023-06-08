@@ -49,3 +49,8 @@ PVC_NAME_SRC=`kubectl get pod $POD_NAME -o custom-columns='DATA:spec.volumes[*].
 PV_NAME_SRC=`kubectl get pv|grep $PVC_NAME_SRC|cut -f 1 -d " "`
 VOL_NAME_SRC=$TRIDENT_PREFIX`echo $PV_NAME_SRC|sed -e s/-/_/g`
 
+
+
+# Ansible
+ansible-galaxy collection install netapp.ontap
+

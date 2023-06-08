@@ -1,0 +1,17 @@
+apiVersion: trident.netapp.io/v1
+kind: TridentBackendConfig
+metadata:
+  name: svmdr-backend
+  namespace: trident
+spec:
+  version: 1
+  backendName: svmdr-backend
+  storageDriverName: ontap-nas
+  managementLIF: 10.128.211.31
+  dataLIF: 10.128.211.49
+  svm: svm_backup
+  credentials:
+    name: backend-tbc-svmdr-backend-secret
+  replicationPolicy: MirrorAllSnapshots
+  storagePrefix:     trident_svmdr_source_80
+  labels: { backend: svmdr }
