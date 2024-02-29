@@ -2,7 +2,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: pvc-svmdr-01
-  namespace: default
+  namespace: dest-svmdrapp01
 spec:
   accessModes:
     - ReadWriteOnce

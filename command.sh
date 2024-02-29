@@ -11,7 +11,7 @@ TMP_CLONE_NAME=fvolume01
 VOL_SIZE=10Gi
 
 # Kubernetes / TRIDENT INFO
-NAMESPACE=default
+NAMESPACE=dest-svmdrapp01
 POD_NAME=catalog-mysql-0
 BACKEND_NAME=bk-ontapnas
 TRIDENT_PREFIX="trident_svm1_34_"
