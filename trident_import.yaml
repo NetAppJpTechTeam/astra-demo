@@ -6,7 +6,7 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
-  storageClassName: ontap-nas
+  storageClassName: ontap-nas-svmdr
   resources:
     requests:
         storage: 10Gi
