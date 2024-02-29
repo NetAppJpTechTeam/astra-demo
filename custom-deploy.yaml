@@ -227,6 +227,7 @@ spec:
       spec:
         accessModes:
         - ReadWriteOnce
+        storageClassName: ontap-nas-svmdr
         resources:
           requests:
             storage: "10Gi"
@@ -590,6 +591,7 @@ spec:
       spec:
         accessModes:
         - ReadWriteOnce
+        storageClassName: ontap-nas-svmdr
         resources:
           requests:
             storage: "10Gi"
